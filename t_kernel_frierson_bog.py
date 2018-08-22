@@ -10,20 +10,14 @@ from functions import write_vars_to_nc_file
 
 def sw_fb():
     # Frierson handling of SW radiation
-    
-    sw_down = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)),
-        [('phalf', p_half), ('lat', lats), ('lon', lons)])
-    sw_up = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)),
-                [('phalf', p_half), ('lat', lats), ('lon', lons)])
-    sw_tau = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)),
-                [('phalf', p_half), ('lat', lats), ('lon', lons)])
+    sw_down = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)), [('phalf', p_half), ('lat', lats), ('lon', lons)])
+    sw_up = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)), [('phalf', p_half), ('lat', lats), ('lon', lons)])
+    sw_tau = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)), [('phalf', p_half), ('lat', lats), ('lon', lons)])
 
     # compute optical depths for each model level
-    sw_tau_0 = np.transpose(np.tile(
-             (1.0 - sw_diff * np.sin(lat_rad)**2) * atm_abs, (nlon, 1)))
+    sw_tau_0 = np.transpose(np.tile((1.0 - sw_diff * np.sin(lat_rad)**2) * atm_abs, (nlon, 1)))
     for k in range(0, nlev + 1):
-        sw_tau[k, :, :] = sw_tau_0 * \
-            (p_half[k] / (mc.pstd_mks / 1.0e2)) ** solar_exponent
+        sw_tau[k, :, :] = sw_tau_0 * (p_half[k] / (mc.pstd_mks / 1.0e2)) ** solar_exponent
 
     # compute downward shortwave flux
     for k in range(0, nlev + 1):
@@ -43,41 +37,32 @@ def lw_down_byrne(b):
     # Convective quasi-equilibrium theory and idealized simulations.
     # J. Climate 26, 4000-4106 (2013).
 
-    lw_down = xr.DataArray(np.zeros((nlev+1, nlat, nlon)),
-            [('phalf', p_half), ('lat', lats), ('lon', lons)])
-    lw_dtrans = xr.DataArray(np.zeros((nlev, nlat, nlon)),
-            [('pfull', p_full), ('lat', lats), ('lon', lons)])
+    lw_down = xr.DataArray(np.zeros((nlev+1, nlat, nlon)), [('phalf', p_half), ('lat', lats), ('lon', lons)])
+    lw_dtrans = xr.DataArray(np.zeros((nlev, nlat, nlon)), [('pfull', p_full), ('lat', lats), ('lon', lons)])
 
     for k in range(0, nlev):
-        lw_del_tau = (bog_a*bog_mu + 0.17*np.log(carbon_conc/360.) \
-                   + bog_b*q[k,:,:])*((p_half[k+1]-p_half[k])/p_half[nlev])
+        lw_del_tau = (bog_a*bog_mu + 0.17*np.log(carbon_conc/360.) + bog_b*q[k,:,:])*((p_half[k+1]-p_half[k])/p_half[nlev])
         lw_dtrans[k,:,:] = np.exp(-lw_del_tau)
         
     # compute downward longwave flux by integrating downward
     for k in range(0, nlev):
-        lw_down[k+1,:,:] = lw_down[k,:,:] * lw_dtrans[k,:,:] \
-                         + b[k,:,:] * (1. - lw_dtrans[k,:,:])
+        lw_down[k+1,:,:] = lw_down[k,:,:] * lw_dtrans[k,:,:] + b[k,:,:] * (1. - lw_dtrans[k,:,:])
 
     return lw_down, lw_dtrans
 
 
 def lw_down_frierson(b):
     # longwave optical thickness function of latitude and pressure
-    lw_down = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)),
-            [('phalf', p_half), ('lat', lats), ('lon', lons)])
-    lw_tau = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)),
-            [('phalf', p_half), ('lat', lats), ('lon', lons)])
-    lw_dtrans = xr.DataArray(np.zeros((nlev, nlat, nlon)),
-            [('pfull', p_full), ('lat', lats), ('lon', lons)])
+    lw_down = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)), [('phalf', p_half), ('lat', lats), ('lon', lons)])
+    lw_tau = xr.DataArray(np.zeros((nlev + 1, nlat, nlon)), [('phalf', p_half), ('lat', lats), ('lon', lons)])
+    lw_dtrans = xr.DataArray(np.zeros((nlev, nlat, nlon)), [('pfull', p_full), ('lat', lats), ('lon', lons)])
     
-    lw_tau_0 = np.transpose(np.tile(ir_tau_eq + 
-            (ir_tau_pole - ir_tau_eq) * np.sin(lat_rad)**2, (nlon,1)))
+    lw_tau_0 = np.transpose(np.tile(ir_tau_eq + (ir_tau_pole - ir_tau_eq) * np.sin(lat_rad)**2, (nlon,1)))
     
     # compute optical depths for each model level
     for k in range(0, nlev+1):
         sigma_k = p_half[k] / (mc.pstd_mks / 1.0e2)
-        lw_tau[k,:,:] = (lw_tau_0 * (linear_tau * sigma_k \
-                     + (1.0 - linear_tau) * sigma_k**wv_exponent))
+        lw_tau[k,:,:] = (lw_tau_0 * (linear_tau * sigma_k + (1.0 - linear_tau) * sigma_k**wv_exponent))
     
     # longwave differential transmissivity
     for k in range(0, nlev):
@@ -86,22 +71,19 @@ def lw_down_frierson(b):
     # compute downward longwave flux by integrating downward
     lw_down[0,:,:] = 0.
     for k in range(0, nlev):
-        lw_down[k+1,:,:] = lw_down[k,:,:] * lw_dtrans[k,:,:] \
-                         + b[k,:,:] * (1. - lw_dtrans[k,:,:])
+        lw_down[k+1,:,:] = lw_down[k,:,:] * lw_dtrans[k,:,:] + b[k,:,:] * (1. - lw_dtrans[k,:,:])
     
     return lw_down, lw_dtrans
 
 
 def lw_up_fb(lw_dtrans, b):
     # compute upward longwave flux by integrating upward
-    lw_up = xr.DataArray(np.zeros((nlev+1, nlat, nlon)),
-            [('phalf', p_half), ('lat', lats), ('lon', lons)])
+    lw_up = xr.DataArray(np.zeros((nlev+1, nlat, nlon)), [('phalf', p_half), ('lat', lats), ('lon', lons)])
 
     lw_up[nlev,:,:] = b_surf
 
     for k in range(nlev-1,-1,-1):
-        lw_up[k,:,:] = lw_up[k+1,:,:] * lw_dtrans[k,:,:] \
-                     + b[k,:,:] * (1.0 - lw_dtrans[k,:,:])
+        lw_up[k,:,:] = lw_up[k+1,:,:] * lw_dtrans[k,:,:] + b[k,:,:] * (1.0 - lw_dtrans[k,:,:])
     return lw_up
 
 
@@ -109,8 +91,7 @@ def temp_level_perturb(temperature, level_idx):
     '''
     1K warming at this level
     '''
-    t_tmp = xr.DataArray(np.zeros((nlev, nlat, nlon)),
-            [('pfull', p_full), ('lat', lats), ('lon', lons)]) 
+    t_tmp = xr.DataArray(np.zeros((nlev, nlat, nlon)), [('pfull', p_full), ('lat', lats), ('lon', lons)])
     for i in range(0, nlev):
         if i != level_idx:
             t_tmp[i,:,:] = temperature[i,:,:]
@@ -212,8 +193,7 @@ if __name__ == '__main__':
     for rad_scheme in rad_schemes:
         logging.info('Radiation scheme: '+rad_scheme)
         # Input profiles 
-        data = xr.open_dataset('./input_data/monthly_avg_data_in_one_year_' \
-                                +rad_scheme+'.nc', decode_times=False)
+        data = xr.open_dataset('./input_data/monthly_avg_data_in_one_year_'+rad_scheme+'.nc', decode_times=False)
     
         p_full = np.array(data.pfull) # units: hPa
         p_half = np.array(data.phalf)
