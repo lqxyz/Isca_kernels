@@ -1,0 +1,66 @@
+*.o
+*.so*
+*.mod
+*.pyc
+*.aux
+*.idx
+*.png
+*.swp
+*~
+.DS_Store
+._.DS_Store
+.nfs*
+tmp.*
+*[._]bak*
+tmp
+
+# LaTeX temporary files
+*.aux
+*.log
+*.toc
+*.aux
+*.out
+*.lof
+*.lot
+*.fls
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+
+## Intermediate documents:
+*.dvi
+*.xdv
+*-converted-to.*
+# these rules might exclude image files for figures etc.
+# *.ps
+# *.eps
+# *.pdf
+
+# Latexmk
+*.fdb_latexmk
+
+# SyncTeX
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+*.pdfsync
+
+# LaTeX Beamer
+*.snm
+*.vrb
+*.nav
+*.out
+
+# BibTeX
+*.bbl
+*.blg
+*.bcf
+*-blx.aux
+*-blx.bib
+*.run.xml
+
+# Ipyhon Notebook
+*.ipynb_checkpoints*/
