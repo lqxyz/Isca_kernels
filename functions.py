@@ -116,10 +116,12 @@ def write_vars_to_nc_file(file_name, variable_names, datas, lats, lons,
 
     # Fill NetCDF with data
     latitudes[:] = lats
-    longitudes[:] = lons
+    if zonal_dim == False:
+        longitudes[:] = lons
     
     latitudebs[:] = latbs
-    longitudebs[:] = lonbs
+    if zonal_dim == False:
+        longitudebs[:] = lonbs
     
     if pressure_dim:
         pfulls[:] = p_full
