@@ -1,15 +1,11 @@
-"""Re-create two stream radiation code from GFDL-MiMA in offline python version"""
-
+from __future__ import print_function
 import numpy as np
 import xarray as xr
-import matplotlib.pyplot as plt
-from scipy.io import loadmat
 import model_constants as mc
-import sys, os
-sys.path.insert(0, '/home/links/ql260/Documents/Exps_Analysis/read_write_file/')
-from nc_write_vars_to_file import *
+import os
 import logging
 import time
+from functions import write_vars_to_nc_file
 
 
 def sw_fb():
