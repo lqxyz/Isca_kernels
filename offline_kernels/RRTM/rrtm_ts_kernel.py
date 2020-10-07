@@ -74,81 +74,78 @@ def run_kernel(nt):
     lw_kernel[nt,:] = new_lwflux - orig_lwflux 
 
 
-# ============================================================= #
-# Read data begin
-# ============================================================= # 
-
-# Recording the running time
-start_time = time.time()
-logfilename = 'out.rrtm.parallel_ts_kernel.log'
-if os.path.exists(logfilename):
-    os.remove(logfilename)
-logging.basicConfig(filename=logfilename,level=logging.DEBUG)
-
-# Read the input dataset
-input_dir = '../../input'
-ds = xar.open_dataset(os.path.join(input_dir, 'three_hourly_avg_data_in_one_year_rrtm.nc'), decode_times=False)
-
-p_full = np.array(ds.pfull) # Units: hPa
-p_half = np.array(ds.phalf)
-nlayers = len(p_full)
-
-lats = np.array(ds.lat)
-lons = np.array(ds.lon)
-nlat = len(lats)
-nlon = len(lons)
-
-# Using 3-hourly data
-ntime = len(ds.index)
-
-T_in = ds.temp.mean(dim='lon')
-sphum_in = ds.sphum.mean(dim='lon')
-
-pavel = p_full[::-1]
-pz = p_half[::-1]
-pz[-1] = 1e-40
-
-# Temperature
-fT = ip.interp1d(p_full, T_in, kind='linear', axis=1, fill_value='extrapolate')
-tavel = fT(pavel)
-tz = fT(pz)
-
-# Water vapour
-q_mmr_in = sphum_in / (1 - sphum_in)
-f = ip.interp1d(p_full, q_mmr_in, kind='linear', axis=1, fill_value='extrapolate')
-q_mmr = f(pavel)
-
-# CO2
-co2 = np.ones(tavel.shape) * 360. / 1.0e6
-
-# Ozone file: ozone_1990(time: 12, pfull: 59, lat: 64, lon: 1)
-o3 = xar.open_dataset(os.path.join(input_dir, 'ozone_1990.nc'), decode_times=False) # mass mixing ratio
-f = ip.interp1d(np.array(o3.pfull), np.array(o3.ozone_1990), kind='linear', axis=1) #, fill_value='extrapolate')
-o3_avel = f(pavel)
-o3_zm_tm = np.mean(o3_avel, axis=(0,3)) # Zonal and annual mean
-
-# Insolation: zenith angle in degree
-coszen = monthly_mean_for_3hourly_datas(ds.coszen.mean(dim='lon'))
-zenith_angle_2d = np.rad2deg(np.arccos(coszen))
-
-lw_kernel = np.zeros((ntime, nlat), dtype=np.double)
-
-# Create shared memory among the processors
-#shared_array_base_lw = multiprocessing.Array(ctypes.c_double, ntime*nlat)
-#lw_kernel = np.ctypeslib.as_array(shared_array_base_lw.get_obj())
-#lw_kernel = lw_kernel.reshape((ntime, nlat))
-
-# ============================================================= #
-# Read data end
-# ============================================================= # 
-
-
-logging.info("ds read and process cost: --- %s seconds --- " % (time.time() - start_time))
-
 if __name__ == '__main__':
+    # ============================================================= #
+    # Read data begin
+    # ============================================================= # 
+
+    # Recording the running time
+    start_time = time.time()
+    logfilename = 'out.rrtm.parallel_ts_kernel.log'
+    if os.path.exists(logfilename):
+        os.remove(logfilename)
+    logging.basicConfig(filename=logfilename,level=logging.DEBUG)
+
+    # Read the input dataset
+    input_dir = '../../input'
+    ds = xar.open_dataset(os.path.join(input_dir, 'three_hourly_avg_data_in_one_year_rrtm.nc'), decode_times=False)
+
+    p_full = np.array(ds.pfull) # Units: hPa
+    p_half = np.array(ds.phalf)
+    nlayers = len(p_full)
+
+    lats = np.array(ds.lat)
+    lons = np.array(ds.lon)
+    nlat = len(lats)
+    nlon = len(lons)
+
+    # Using 3-hourly data
+    ntime = len(ds.index)
+
+    T_in = ds.temp.mean(dim='lon')
+    sphum_in = ds.sphum.mean(dim='lon')
+
+    pavel = p_full[::-1]
+    pz = p_half[::-1]
+    pz[-1] = 1e-40
+
+    # Temperature
+    fT = ip.interp1d(p_full, T_in, kind='linear', axis=1, fill_value='extrapolate')
+    tavel = fT(pavel)
+    tz = fT(pz)
+
+    # Water vapour
+    q_mmr_in = sphum_in / (1 - sphum_in)
+    f = ip.interp1d(p_full, q_mmr_in, kind='linear', axis=1, fill_value='extrapolate')
+    q_mmr = f(pavel)
+
+    # CO2
+    co2 = np.ones(tavel.shape) * 360. / 1.0e6
+
+    # Ozone file: ozone_1990(time: 12, pfull: 59, lat: 64, lon: 1)
+    o3 = xar.open_dataset(os.path.join(input_dir, 'ozone_1990.nc'), decode_times=False) # mass mixing ratio
+    f = ip.interp1d(np.array(o3.pfull), np.array(o3.ozone_1990), kind='linear', axis=1) #, fill_value='extrapolate')
+    o3_avel = f(pavel)
+    o3_zm_tm = np.mean(o3_avel, axis=(0,3)) # Zonal and annual mean
+
+    # Insolation: zenith angle in degree
+    coszen = monthly_mean_for_3hourly_datas(ds.coszen.mean(dim='lon'))
+    zenith_angle_2d = np.rad2deg(np.arccos(coszen))
+
+    lw_kernel = np.zeros((ntime, nlat), dtype=np.double)
+
+    # Create shared memory among the processors
+    #shared_array_base_lw = multiprocessing.Array(ctypes.c_double, ntime*nlat)
+    #lw_kernel = np.ctypeslib.as_array(shared_array_base_lw.get_obj())
+    #lw_kernel = lw_kernel.reshape((ntime, nlat))
+
+    # ============================================================= #
+    # Read data end
+    # ============================================================= # 
+
+    logging.info("ds read and process cost: --- %s seconds --- " % (time.time() - start_time))
 
     now = time.time() 
-
     for nt in range(ntime):
         run_kernel(nt)
 
