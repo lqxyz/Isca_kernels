@@ -1,1 +1,1 @@
-Demo how to calculate feedbacks from kernel data.
+Demonstrate how to calculate feedbacks from kernel data.
