@@ -188,7 +188,7 @@ def calc_water_vapor_feedback_from_monthly_kernel(ds1, ds_diff, wv_kernel):
     dqs_dT = (qs2 - qs1) / dT # dT is 1K
     rh = q1 / qs1          # assuming RH is fixed when warming
     dq_dT = rh * dqs_dT       
-    dlogq_dT = dq_dT / q1  # natural log of water vapor using in the kernel calculation
+    dlogq_dT = dq_dT / q1  # change in the natural log of water vapor using in the kernel calculation
     dlogq = q_diff / q1    # change in the natural log of the water vapor in perturbed exps
 
     response = wv_kernel * dlogq / dlogq_dT
