@@ -50,7 +50,7 @@ def saturation_specific_humidity(temp):
     es = 6.112 * np.exp(17.67 * (temp - 273.15) / (temp - 29.65))  # hPa
     es = xr.DataArray(es, coords=[temp.time, temp.pfull, temp.lat, temp.lon],
                       dims=['time', 'pfull', 'lat', 'lon'])
-    ws = 0.622 * es / (temp.pfull - es)
+    ws = 0.622 * es / (temp.pfull - es)  # Needs to check again??
     qs = ws / (1 + ws)
     qs = xr.DataArray(qs, coords=[temp.time, temp.pfull, temp.lat, temp.lon],
                     dims=['time', 'pfull', 'lat', 'lon'])
