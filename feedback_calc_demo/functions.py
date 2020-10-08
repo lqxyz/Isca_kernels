@@ -1,9 +1,7 @@
-# coding: utf-8
-
+from __future__ import print_function
 import numpy as np
 import xarray as xr
 import netCDF4
-
 
 def add_datetime_info(data):
     time = data.time
@@ -29,7 +27,6 @@ def add_datetime_info(data):
     data.coords['season'] = ('time', seasons)
     data.coords['day'] = ('time', days)
     data.coords['hour'] = ('time', hours)
-
 
 def saturation_specific_humidity(temp):
     '''

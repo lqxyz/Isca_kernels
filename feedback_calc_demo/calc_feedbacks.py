@@ -6,7 +6,6 @@ import sys
 import os
 from functions import add_datetime_info, saturation_specific_humidity
 
-
 def read_kernel(filename, varname):
     ds = xr.open_dataset(filename, decode_times=False)
     pfull = ds.pfull
@@ -34,7 +33,6 @@ def read_kernel(filename, varname):
     kernel.attrs['global_mean'] = global_mean_kernel
     
     return kernel
-
 
 def read_rad_scheme_kernels(rad_scheme):
     '''
@@ -85,11 +83,7 @@ def read_rad_scheme_kernels(rad_scheme):
     
     return lw_kernels, sw_kernels, total_kernels
 
-
 def calc_planck_feedback_from_monthly_kernel(ds_diff, t_kernel, ts_kerenl):
-    '''
-    lw_kernels: kernel dictionary, key values are 't', 'ts', 'wv'
-    '''
 
     lats = ds_diff.lat
     lons = ds_diff.lon
@@ -127,14 +121,7 @@ def calc_planck_feedback_from_monthly_kernel(ds_diff, t_kernel, ts_kerenl):
 
     return planck_feedback  #(month, lat, lon)
 
-
 def calc_lapse_rate_feedback_from_monthly_kernel(ds_diff, t_kernel):
-    '''
-    lw_kernels: kernel dictionary, key values are 't', 'ts', 'wv'
-    '''
-
-    # Temperature kernel
-     = lw_kernels['t']
 
     lats = ds_diff.lat
     lons = ds_diff.lon
@@ -170,7 +157,6 @@ def calc_lapse_rate_feedback_from_monthly_kernel(ds_diff, t_kernel):
     print('Global mean lapse rate feedback parameter is ' + str(lapse_rate_fb_gm))
 
     return lapse_rate_feedback  #(month, lat, lon)
-
 
 def calc_water_vapor_feedback_from_monthly_kernel(ds1, ds_diff, wv_kernel): 
     '''
@@ -209,7 +195,6 @@ def calc_water_vapor_feedback_from_monthly_kernel(ds1, ds_diff, wv_kernel):
     wv_feedback = response.sum(dim='pfull')) / ts_diff
 
     return wv_feedback # (month, lat, lon)
-
 
 # --------------- Main Program --------------- #
 if __name__ == "__main__":
