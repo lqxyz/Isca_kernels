@@ -117,7 +117,7 @@ def calc_planck_feedback_from_monthly_kernel(ds_diff, t_kernel, ts_kerenl):
     planck_response_gm = np.average(planck_response.mean(('month', 'lon')), weights=coslats, axis=0)
     ts_diff_gm = np.average(ts_diff.mean(('month', 'lon')), weights=coslats, axis=0)
     planck_fb_gm = planck_response_gm / ts_diff_gm
-    print('Global mean Planck feedback parameter is ' + str(planck_fb_gm))
+    print('Global mean Planck feedback parameter is ' + str(planck_fb_gm) + 'W/m^2/K.')
 
     return planck_feedback  #(month, lat, lon)
 
@@ -151,10 +151,10 @@ def calc_lapse_rate_feedback_from_monthly_kernel(ds_diff, t_kernel):
     lapse_rate_feedback = tempk.sum(dim='pfull') / ts_diff
 
     # Print global average
-    tempk_gm = np.average(tempk.mean(('month', 'lon')), weights=coslats, axis=0)
+    tempk_gm = np.average(tempk.sum(dim='pfull').mean(('month', 'lon')), weights=coslats, axis=0)
     ts_diff_gm = np.average(ts_diff.mean(('month', 'lon')), weights=coslats, axis=0)
     lapse_rate_fb_gm = tempk_gm / ts_diff_gm
-    print('Global mean lapse rate feedback parameter is ' + str(lapse_rate_fb_gm))
+    print('Global mean lapse rate feedback parameter is ' + str(lapse_rate_fb_gm) + 'W/m^2/K.')
 
     return lapse_rate_feedback  #(month, lat, lon)
 
@@ -193,6 +193,14 @@ def calc_water_vapor_feedback_from_monthly_kernel(ds1, ds_diff, wv_kernel):
 
     response = wv_kernel * dlogq / dlogq_dT
     wv_feedback = response.sum(dim='pfull')) / ts_diff
+
+    # Print global average
+    lats = ds_diff.lat
+    coslats = np.cos(np.deg2rad(lats))
+    response_gm = np.average(response.sum(dim='pfull').mean(('month', 'lon')), weights=coslats, axis=0)
+    ts_diff_gm = np.average(ts_diff.mean(('month', 'lon')), weights=coslats, axis=0)
+    wv_fb_gm = response_gm / ts_diff_gm
+    print('Global mean water vapor feedback parameter is ' + str(wv_fb_gm) + 'W/m^2/K.')
 
     return wv_feedback # (month, lat, lon)
 
