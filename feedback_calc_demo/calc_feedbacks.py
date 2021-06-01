@@ -83,7 +83,7 @@ def read_rad_scheme_kernels(rad_scheme):
     
     return lw_kernels, sw_kernels, total_kernels
 
-def calc_planck_feedback_from_monthly_kernel(ds_diff, t_kernel, ts_kerenl):
+def calc_planck_feedback_from_monthly_kernel(ds_diff, t_kernel, ts_kernel):
 
     lats = ds_diff.lat
     lons = ds_diff.lon
