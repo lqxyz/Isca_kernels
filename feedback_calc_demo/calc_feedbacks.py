@@ -101,7 +101,7 @@ def calc_planck_feedback_from_monthly_kernel(ds_diff, t_kernel, ts_kernel):
     for tt in range(12):
         for nn in range(nlev):
             ts_diff_vert[tt,nn,:,:] = ts_diff[tt,:,:]  # uniform warming as surface
-    ts_diff_vert = xr.DataArray(ts_diff_vert, coords=[range(12), pfull, lats, lons],
+    ts_diff_vert = xr.DataArray(ts_diff_vert, coords=[np.arange(1,13,1), pfull, lats, lons],
                      dims=['month','pfull','lat', 'lon'])
 
     tsk = ts_diff_vert * t_kernel
