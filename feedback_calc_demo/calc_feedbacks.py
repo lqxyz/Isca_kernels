@@ -144,7 +144,7 @@ def calc_lapse_rate_feedback_from_monthly_kernel(ds_diff, t_kernel):
                             dims=['month', 'pfull', 'lat', 'lon'])
 
     del_tair_ts = ta_diff - ts_diff_vert
-    del_tair_ts = xr.DataArray(del_tair_ts, coords=[range(12), pfull, lats, lons], 
+    del_tair_ts = xr.DataArray(del_tair_ts, coords=[np.arange(1,13,1), pfull, lats, lons], 
                             dims=['month', 'pfull', 'lat', 'lon'])
 
     tempk = del_tair_ts * t_kernel
