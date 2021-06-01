@@ -192,7 +192,7 @@ def calc_water_vapor_feedback_from_monthly_kernel(ds1, ds_diff, wv_kernel):
     dlogq = q_diff / q1    # change in the natural log of the water vapor in perturbed exps
 
     response = wv_kernel * dlogq / dlogq_dT
-    wv_feedback = response.sum(dim='pfull')) / ts_diff
+    wv_feedback = response.sum(dim='pfull') / ts_diff
 
     # Print global average
     lats = ds_diff.lat
